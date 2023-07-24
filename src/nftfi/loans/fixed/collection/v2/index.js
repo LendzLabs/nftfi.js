@@ -13,7 +13,6 @@ class LoansFixedCollectionV2 {
   }
 
   async acceptOffer(options) {
-    let success;
     try {
       const offer = {
         loanERC20Denomination: options.offer.terms.loan.currency,
@@ -39,11 +38,16 @@ class LoansFixedCollectionV2 {
         function: 'acceptOffer',
         args: [offer, signature, borrowerSettings]
       });
-      success = result?.status === 1;
+      return {
+        receipt: result,
+        status: result?.status === 1,
+      }
     } catch (e) {
-      success = false;
+      return {
+        receipt: null,
+        status: false,
+      };
     }
-    return success;
   }
 
   async liquidateOverdueLoan(options) {
@@ -61,17 +65,21 @@ class LoansFixedCollectionV2 {
   }
 
   async payBackLoan(options) {
-    let success;
     try {
       const result = await this.#contract.call({
         function: 'payBackLoan',
         args: [options.loan.id]
       });
-      success = result?.status === 1;
+      return {
+        receipt: result,
+        status: result?.status === 1,
+      }
     } catch (e) {
-      success = false;
+      return {
+        receipt: null,
+        status: false,
+      };
     }
-    return success;
   }
 
   async cancelLoanCommitmentBeforeLoanHasBegun(options) {

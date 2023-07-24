@@ -101,8 +101,7 @@ class Loans {
     const contractName = options.offer.nftfi.contract.name;
     switch (contractName) {
       case 'v2-1.loan.fixed': {
-        let success = await this.#fixed.v2_1.acceptOffer(options);
-        response = { success };
+        response = await this.#fixed.v2_1.acceptOffer(options);
         break;
       }
       case 'v2-3.loan.fixed': {
@@ -111,8 +110,7 @@ class Loans {
         break;
       }
       case 'v2.loan.fixed.collection': {
-        let success = await this.#fixed.collection.v2.acceptOffer(options);
-        response = { success };
+        response = await this.#fixed.collection.v2.acceptOffer(options);
         break;
       }
       case 'v2-3.loan.fixed.collection': {
@@ -230,20 +228,20 @@ class Loans {
    * });
    */
   async repay(options) {
-    let success = false;
+    let response = false;
     switch (options.nftfi.contract.name) {
       case 'v1.loan.fixed':
-        success = await this.#fixed.v1.payBackLoan({
+        response = await this.#fixed.v1.payBackLoan({
           loan: { id: options.loan.id }
         });
         break;
       case 'v2.loan.fixed':
-        success = await this.#fixed.v2.payBackLoan({
+        response = await this.#fixed.v2.payBackLoan({
           loan: { id: options.loan.id }
         });
         break;
       case 'v2-1.loan.fixed':
-        success = await this.#fixed.v2_1.payBackLoan({
+        response = await this.#fixed.v2_1.payBackLoan({
           loan: { id: options.loan.id }
         });
         break;
@@ -253,7 +251,7 @@ class Loans {
         });
         break;
       case 'v2.loan.fixed.collection':
-        success = await this.#fixed.collection.v2.payBackLoan({
+        response = await this.#fixed.collection.v2.payBackLoan({
           loan: { id: options.loan.id }
         });
         break;
@@ -263,9 +261,7 @@ class Loans {
         });
         break;
     }
-    return {
-      success
-    };
+    return response
   }
 
   /**
