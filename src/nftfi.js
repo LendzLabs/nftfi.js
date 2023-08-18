@@ -151,7 +151,7 @@ export default {
       const pk = options?.ethereum?.account?.privateKey;
       const address = options?.ethereum?.account?.address || ethersjs.utils.computeAddress(pk);
       //impersonate account in test mode
-      signer = (pk !== undefined && pk === 'test') ? await provider.getSigner(address) : new ethersjs.Wallet(pk, provider);
+      signer = await provider.getSigner(address);
       const eoa = new EOA({ address, signer, provider });
       account = new Account({ account: options?.dependencies?.account || eoa });
     }
