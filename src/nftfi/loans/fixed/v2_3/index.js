@@ -13,12 +13,11 @@ class LoansFixedV2_3 {
   }
 
   async acceptOffer(options) {
-    let success;
     try {
       const offer = {
         loanERC20Denomination: options.offer.terms.loan.currency,
-        loanPrincipalAmount: String(options.offer.terms.loan.principal),
-        maximumRepaymentAmount: String(options.offer.terms.loan.repayment),
+        loanPrincipalAmount: options.offer.terms.loan.principal.toLocaleString('fullwide', { useGrouping: false }),
+        maximumRepaymentAmount: options.offer.terms.loan.repayment.toLocaleString('fullwide', { useGrouping: false }),
         nftCollateralContract: options.offer.nft.address,
         nftCollateralId: options.offer.nft.id,
         referrer: '0x0000000000000000000000000000000000000000',
@@ -39,11 +38,16 @@ class LoansFixedV2_3 {
         function: 'acceptOffer',
         args: [offer, signature, borrowerSettings]
       });
-      success = result?.status === 1;
+      return {
+        receipt: result,
+        status: result?.status === 1,
+      }
     } catch (e) {
-      success = false;
+      return {
+        receipt: null,
+        status: false,
+      }
     }
-    return success;
   }
 
   async liquidateOverdueLoan(options) {
@@ -67,11 +71,16 @@ class LoansFixedV2_3 {
         function: 'payBackLoan',
         args: [options.loan.id]
       });
-      success = result?.status === 1;
+      return {
+        receipt: result,
+        status: result?.status === 1,
+      }
     } catch (e) {
-      success = false;
+      return {
+        receipt: null,
+        status: false,
+      }
     }
-    return success;
   }
 
   async cancelLoanCommitmentBeforeLoanHasBegun(options) {
