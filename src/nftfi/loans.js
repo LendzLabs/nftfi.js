@@ -245,73 +245,37 @@ class Loans {
    * });
    */
   async repay(options) {
-<<<<<<< HEAD
-    let response = false;
-    switch (options.nftfi.contract.name) {
-      case 'v1.loan.fixed':
-        response = await this.#fixed.v1.payBackLoan({
-          loan: { id: options.loan.id }
-        });
-        break;
-      case 'v2.loan.fixed':
-        response = await this.#fixed.v2.payBackLoan({
-          loan: { id: options.loan.id }
-        });
-        break;
-      case 'v2-1.loan.fixed':
-        response = await this.#fixed.v2_1.payBackLoan({
-          loan: { id: options.loan.id }
-        });
-        break;
-      case 'v2-3.loan.fixed':
-        success = await this.#fixed.v2_3.payBackLoan({
-          loan: { id: options.loan.id }
-        });
-        break;
-      case 'v2.loan.fixed.collection':
-        response = await this.#fixed.collection.v2.payBackLoan({
-          loan: { id: options.loan.id }
-        });
-        break;
-      case 'v2-3.loan.fixed.collection':
-        success = await this.#fixed.collection.v2_3.payBackLoan({
-          loan: { id: options.loan.id }
-        });
-        break;
-    }
-    return response
-=======
     try {
       this.#assertion.hasSigner();
-      let success = false;
+      let response = false;
       switch (options.nftfi.contract.name) {
         case 'v1.loan.fixed':
-          success = await this.#fixed.v1.payBackLoan({
+          response = await this.#fixed.v1.payBackLoan({
             loan: { id: options.loan.id }
           });
           break;
         case 'v2.loan.fixed':
-          success = await this.#fixed.v2.payBackLoan({
+          response = await this.#fixed.v2.payBackLoan({
             loan: { id: options.loan.id }
           });
           break;
         case 'v2-1.loan.fixed':
-          success = await this.#fixed.v2_1.payBackLoan({
+          response = await this.#fixed.v2_1.payBackLoan({
             loan: { id: options.loan.id }
           });
           break;
         case 'v2-3.loan.fixed':
-          success = await this.#fixed.v2_3.payBackLoan({
+          response = await this.#fixed.v2_3.payBackLoan({
             loan: { id: options.loan.id }
           });
           break;
         case 'v2.loan.fixed.collection':
-          success = await this.#fixed.collection.v2.payBackLoan({
+          response = await this.#fixed.collection.v2.payBackLoan({
             loan: { id: options.loan.id }
           });
           break;
         case 'v2-3.loan.fixed.collection':
-          success = await this.#fixed.collection.v2_3.payBackLoan({
+          response = await this.#fixed.collection.v2_3.payBackLoan({
             loan: { id: options.loan.id }
           });
           break;
@@ -322,7 +286,6 @@ class Loans {
     } catch (e) {
       return this.#error.handle(e);
     }
->>>>>>> 0958d2f36b379bf57f699531f461322225560aff
   }
 
   /**
