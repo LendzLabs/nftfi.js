@@ -20,6 +20,8 @@ var _config = /*#__PURE__*/new WeakMap();
 var _contractFactory = /*#__PURE__*/new WeakMap();
 var _account = /*#__PURE__*/new WeakMap();
 var _BN = /*#__PURE__*/new WeakMap();
+var _error = /*#__PURE__*/new WeakMap();
+var _assertion = /*#__PURE__*/new WeakMap();
 /**
  * @class
  * Class for working with ERC20 tokens.
@@ -43,10 +45,20 @@ var Erc20 = /*#__PURE__*/function () {
       writable: true,
       value: void 0
     });
+    _classPrivateFieldInitSpec(this, _error, {
+      writable: true,
+      value: void 0
+    });
+    _classPrivateFieldInitSpec(this, _assertion, {
+      writable: true,
+      value: void 0
+    });
     (0, _classPrivateFieldSet2["default"])(this, _config, options === null || options === void 0 ? void 0 : options.config);
     (0, _classPrivateFieldSet2["default"])(this, _contractFactory, options === null || options === void 0 ? void 0 : options.contractFactory);
     (0, _classPrivateFieldSet2["default"])(this, _account, options === null || options === void 0 ? void 0 : options.account);
     (0, _classPrivateFieldSet2["default"])(this, _BN, options === null || options === void 0 ? void 0 : options.BN);
+    (0, _classPrivateFieldSet2["default"])(this, _error, options === null || options === void 0 ? void 0 : options.error);
+    (0, _classPrivateFieldSet2["default"])(this, _assertion, options === null || options === void 0 ? void 0 : options.assertion);
   }
   (0, _createClass2["default"])(Erc20, [{
     key: "_getContractAddress",
@@ -75,43 +87,50 @@ var Erc20 = /*#__PURE__*/function () {
      * @param {object} options - Hashmap of config options for this method
      * @param {object} [options.account.address] - The account address to get the allowance of (optional)
      * @param {string} options.token.address - The ERC20 token address
-     * @param {string} options.nftfi.contract.name - The name of the contract NFTfi contract (eg. `v1.loan.fixed`, `v2.loan.fixed`, `v2-1.loan.fixed`)
+     * @param {string} options.nftfi.contract.name - The name of the contract NFTfi contract (eg. `v2-3.loan.fixed`, `v2-3.loan.fixed.collection`)
      * @returns {number} The user account's token allowance for that contract, in base units (eg. 1000000000000000000 wei)
      *
      * @example
      * const balance = await nftfi.erc20.allowance({
      *  token: { address: '0x00000000' },
-     *  nftfi: { contract: { name: 'v2-1.loan.fixed' } }
+     *  nftfi: { contract: { name: 'v2-3.loan.fixed' } }
      * });
      */
   }, {
     key: "allowance",
     value: function () {
       var _allowance = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(options) {
-        var _options$account;
-        var contractName, contractAddress, accountAddress, contract;
+        var _options$account, _options$account2, contractName, contractAddress, accountAddress, contract;
         return _regenerator["default"].wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
+              _context.prev = 0;
+              if (!(options !== null && options !== void 0 && (_options$account = options.account) !== null && _options$account !== void 0 && _options$account.address)) {
+                (0, _classPrivateFieldGet2["default"])(this, _assertion).hasAddress('Account address required, please provide a value in options.account.address or on sdk initialization.');
+              }
               contractName = options.nftfi.contract.name;
               contractAddress = this._getContractAddress(contractName);
-              accountAddress = (options === null || options === void 0 ? void 0 : (_options$account = options.account) === null || _options$account === void 0 ? void 0 : _options$account.address) || (0, _classPrivateFieldGet2["default"])(this, _account).getAddress();
+              accountAddress = (options === null || options === void 0 ? void 0 : (_options$account2 = options.account) === null || _options$account2 === void 0 ? void 0 : _options$account2.address) || (0, _classPrivateFieldGet2["default"])(this, _account).getAddress();
               contract = (0, _classPrivateFieldGet2["default"])(this, _contractFactory).create({
                 address: options.token.address,
                 abi: (0, _classPrivateFieldGet2["default"])(this, _config).erc20.abi
               });
-              _context.next = 6;
+              _context.next = 8;
               return contract.call({
                 "function": 'allowance',
                 args: [accountAddress, contractAddress]
               });
-            case 6:
+            case 8:
               return _context.abrupt("return", _context.sent);
-            case 7:
+            case 11:
+              _context.prev = 11;
+              _context.t0 = _context["catch"](0);
+              return _context.abrupt("return", (0, _classPrivateFieldGet2["default"])(this, _error).handle(_context.t0));
+            case 14:
             case "end":
               return _context.stop();
           }
-        }, _callee, this);
+        }, _callee, this, [[0, 11]]);
       }));
       function allowance(_x) {
         return _allowance.apply(this, arguments);
@@ -123,7 +142,7 @@ var Erc20 = /*#__PURE__*/function () {
      *
      * @param {object} options - Hashmap of config options for this method
      * @param {string} options.token.address - The ERC20 token address
-     * @param {string} options.nftfi.contract.name - The name of the contract NFTfi contract (eg. `v1.loan.fixed`, `v2.loan.fixed`, `v2-1.loan.fixed`)
+     * @param {string} options.nftfi.contract.name - The name of the contract NFTfi contract (eg. `v2-3.loan.fixed`, `v2-3.loan.fixed.collection`)
      * @param {number} options.amount - The token amount to approve, in base units (eg. 1000000000000000000 wei)
      * @returns {boolean} Boolean value indicating whether the operation succeeded
      *
@@ -131,7 +150,7 @@ var Erc20 = /*#__PURE__*/function () {
      * const results = await nftfi.erc20.approve({
      *   amount: 1000000000000000000,
      *   token: { address: '0x00000000' },
-     *   nftfi: { contract: { name: 'v2-1.loan.fixed' } }
+     *   nftfi: { contract: { name: 'v2-3.loan.fixed' } }
      * });
      */
   }, {
@@ -142,42 +161,49 @@ var Erc20 = /*#__PURE__*/function () {
         return _regenerator["default"].wrap(function _callee2$(_context2) {
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
+              _context2.prev = 0;
+              (0, _classPrivateFieldGet2["default"])(this, _assertion).hasAddress();
               contractName = options.nftfi.contract.name;
               contractAddress = this._getContractAddress(contractName);
               contract = (0, _classPrivateFieldGet2["default"])(this, _contractFactory).create({
                 address: options.token.address,
                 abi: (0, _classPrivateFieldGet2["default"])(this, _config).erc20.abi
               });
-              _context2.next = 5;
+              _context2.next = 7;
               return this.allowance(options);
-            case 5:
+            case 7:
               allowance = _context2.sent;
               amount = options.amount.toLocaleString('fullwide', {
                 useGrouping: false
               });
               if (!(allowance.lt(amount) || amount === '0')) {
-                _context2.next = 14;
+                _context2.next = 17;
                 break;
               }
-              _context2.next = 10;
+              (0, _classPrivateFieldGet2["default"])(this, _assertion).hasSigner();
+              _context2.next = 13;
               return contract.call({
                 "function": 'approve',
                 args: [contractAddress, amount]
               });
-            case 10:
+            case 13:
               result = _context2.sent;
               success = (result === null || result === void 0 ? void 0 : result.status) === 1;
-              _context2.next = 15;
+              _context2.next = 18;
               break;
-            case 14:
+            case 17:
               success = true;
-            case 15:
+            case 18:
               return _context2.abrupt("return", success);
-            case 16:
+            case 21:
+              _context2.prev = 21;
+              _context2.t0 = _context2["catch"](0);
+              return _context2.abrupt("return", (0, _classPrivateFieldGet2["default"])(this, _error).handle(_context2.t0));
+            case 24:
             case "end":
               return _context2.stop();
           }
-        }, _callee2, this);
+        }, _callee2, this, [[0, 21]]);
       }));
       function approve(_x2) {
         return _approve.apply(this, arguments);
@@ -189,13 +215,13 @@ var Erc20 = /*#__PURE__*/function () {
      *
      * @param {object} options - Hashmap of config options for this method
      * @param {string} options.token.address - The ERC20 token address
-     * @param {string} options.nftfi.contract.name - The name of the contract NFTfi contract (eg. `v1.loan.fixed`, `v2.loan.fixed`, `v2-1.loan.fixed`)
+     * @param {string} options.nftfi.contract.name - The name of the contract NFTfi contract (eg. `v2-3.loan.fixed`, `v2-3.loan.fixed.collection`)
      * @returns {boolean} Boolean value indicating whether the operation succeeded
      *
      * @example
      * const results = await nftfi.erc20.approveMax({
      *   token: { address: '0x00000000' },
-     *   nftfi: { contract: { name: 'v2-1.loan.fixed' } }
+     *   nftfi: { contract: { name: 'v2-3.loan.fixed' } }
      * });
      */
   }, {
@@ -238,29 +264,36 @@ var Erc20 = /*#__PURE__*/function () {
     key: "balanceOf",
     value: function () {
       var _balanceOf = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4(options) {
-        var _options$account2;
-        var contract, accountAddress, balance;
+        var _options$account3, _options$account4, contract, accountAddress, balance;
         return _regenerator["default"].wrap(function _callee4$(_context4) {
           while (1) switch (_context4.prev = _context4.next) {
             case 0:
+              _context4.prev = 0;
+              if (!(options !== null && options !== void 0 && (_options$account3 = options.account) !== null && _options$account3 !== void 0 && _options$account3.address)) {
+                (0, _classPrivateFieldGet2["default"])(this, _assertion).hasAddress('Account address required, please provide a value in options.account.address or on sdk initialization.');
+              }
               contract = (0, _classPrivateFieldGet2["default"])(this, _contractFactory).create({
                 address: options.token.address,
                 abi: (0, _classPrivateFieldGet2["default"])(this, _config).erc20.abi
               });
-              accountAddress = (options === null || options === void 0 ? void 0 : (_options$account2 = options.account) === null || _options$account2 === void 0 ? void 0 : _options$account2.address) || (0, _classPrivateFieldGet2["default"])(this, _account).getAddress();
-              _context4.next = 4;
+              accountAddress = (options === null || options === void 0 ? void 0 : (_options$account4 = options.account) === null || _options$account4 === void 0 ? void 0 : _options$account4.address) || (0, _classPrivateFieldGet2["default"])(this, _account).getAddress();
+              _context4.next = 6;
               return contract.call({
                 "function": 'balanceOf',
                 args: [accountAddress]
               });
-            case 4:
+            case 6:
               balance = _context4.sent;
               return _context4.abrupt("return", balance);
-            case 6:
+            case 10:
+              _context4.prev = 10;
+              _context4.t0 = _context4["catch"](0);
+              return _context4.abrupt("return", (0, _classPrivateFieldGet2["default"])(this, _error).handle(_context4.t0));
+            case 13:
             case "end":
               return _context4.stop();
           }
-        }, _callee4, this);
+        }, _callee4, this, [[0, 10]]);
       }));
       function balanceOf(_x4) {
         return _balanceOf.apply(this, arguments);

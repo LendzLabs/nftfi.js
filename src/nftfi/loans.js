@@ -8,6 +8,8 @@ class Loans {
   #fixed;
   #config;
   #helper;
+  #assertion;
+  #error;
 
   constructor(options = {}) {
     this.#api = options?.api;
@@ -15,6 +17,8 @@ class Loans {
     this.#account = options?.account;
     this.#fixed = options?.fixed;
     this.#helper = options?.helper;
+    this.#assertion = options?.assertion;
+    this.#error = options?.error;
   }
 
   /**
@@ -35,17 +39,22 @@ class Loans {
    * });
    */
   async get(options) {
-    let response = await this.#api.get({
-      uri: 'v0.1/loans',
-      params: {
-        accountAddress: this.#account.getAddress(),
-        counterparty: options.filters.counterparty,
-        status: options.filters.status
-      }
-    });
-    let loans = response['results'];
-    loans = loans.map(this.#helper.addCurrencyUnit);
-    return loans;
+    try {
+      this.#assertion.hasAddress();
+      let response = await this.#api.get({
+        uri: 'v0.1/loans',
+        params: {
+          accountAddress: this.#account.getAddress(),
+          counterparty: options.filters.counterparty,
+          status: options.filters.status
+        }
+      });
+      let loans = response['results'];
+      loans = loans.map(this.#helper.addCurrencyUnit);
+      return loans;
+    } catch (e) {
+      return this.#error.handle(e);
+    }
   }
 
   /**
@@ -96,35 +105,38 @@ class Loans {
    * });
    */
   async begin(options) {
-    let errors;
-    let response;
-    const contractName = options.offer.nftfi.contract.name;
-    switch (contractName) {
-      case 'v2-1.loan.fixed': {
-        response = await this.#fixed.v2_1.acceptOffer(options);
-        break;
+    try {
+      this.#assertion.hasSigner();
+      let errors;
+      let response;
+      const contractName = options.offer.nftfi.contract.name;
+      switch (contractName) {
+        case 'v2-1.loan.fixed': {
+          response = await this.#fixed.v2_1.acceptOffer(options);
+          break;
+        }
+        case 'v2-3.loan.fixed': {
+          response = await this.#fixed.v2_3.acceptOffer(options);
+          break;
+        }
+        case 'v2.loan.fixed.collection': {
+          response = await this.#fixed.collection.v2.acceptOffer(options);
+          break;
+        }
+        case 'v2-3.loan.fixed.collection': {
+          response = await this.#fixed.collection.v2_3.acceptOffer(options);
+          break;
+        }
+        default: {
+          errors = { 'nftfi.contract.name': [`${contractName} not supported`] };
+          response = { errors };
+          break;
+        }
       }
-      case 'v2-3.loan.fixed': {
-        let success = await this.#fixed.v2_3.acceptOffer(options);
-        response = { success };
-        break;
-      }
-      case 'v2.loan.fixed.collection': {
-        response = await this.#fixed.collection.v2.acceptOffer(options);
-        break;
-      }
-      case 'v2-3.loan.fixed.collection': {
-        let success = await this.#fixed.collection.v2_3.acceptOffer(options);
-        response = { success };
-        break;
-      }
-      default: {
-        errors = { 'nftfi.contract.name': [`${contractName} not supported`] };
-        response = { errors };
-        break;
-      }
+      return response;
+    } catch (e) {
+      return this.#error.handle(e);
     }
-    return response;
   }
 
   /**
@@ -159,42 +171,47 @@ class Loans {
    * });
    */
   async liquidate(options) {
-    let success = false;
-    switch (options.nftfi.contract.name) {
-      case 'v1.loan.fixed':
-        success = await this.#fixed.v1.liquidateOverdueLoan({
-          loan: { id: options.loan.id }
-        });
-        break;
-      case 'v2.loan.fixed':
-        success = await this.#fixed.v2.liquidateOverdueLoan({
-          loan: { id: options.loan.id }
-        });
-        break;
-      case 'v2.loan.fixed.collection':
-        success = await this.#fixed.collection.v2.liquidateOverdueLoan({
-          loan: { id: options.loan.id }
-        });
-        break;
-      case 'v2-3.loan.fixed.collection':
-        success = await this.#fixed.collection.v2_3.liquidateOverdueLoan({
-          loan: { id: options.loan.id }
-        });
-        break;
-      case 'v2-1.loan.fixed':
-        success = await this.#fixed.v2_1.liquidateOverdueLoan({
-          loan: { id: options.loan.id }
-        });
-        break;
-      case 'v2-3.loan.fixed':
-        success = await this.#fixed.v2_3.liquidateOverdueLoan({
-          loan: { id: options.loan.id }
-        });
-        break;
+    try {
+      this.#assertion.hasSigner();
+      let success = false;
+      switch (options.nftfi.contract.name) {
+        case 'v1.loan.fixed':
+          success = await this.#fixed.v1.liquidateOverdueLoan({
+            loan: { id: options.loan.id }
+          });
+          break;
+        case 'v2.loan.fixed':
+          success = await this.#fixed.v2.liquidateOverdueLoan({
+            loan: { id: options.loan.id }
+          });
+          break;
+        case 'v2.loan.fixed.collection':
+          success = await this.#fixed.collection.v2.liquidateOverdueLoan({
+            loan: { id: options.loan.id }
+          });
+          break;
+        case 'v2-3.loan.fixed.collection':
+          success = await this.#fixed.collection.v2_3.liquidateOverdueLoan({
+            loan: { id: options.loan.id }
+          });
+          break;
+        case 'v2-1.loan.fixed':
+          success = await this.#fixed.v2_1.liquidateOverdueLoan({
+            loan: { id: options.loan.id }
+          });
+          break;
+        case 'v2-3.loan.fixed':
+          success = await this.#fixed.v2_3.liquidateOverdueLoan({
+            loan: { id: options.loan.id }
+          });
+          break;
+      }
+      return {
+        success
+      };
+    } catch (e) {
+      return this.#error.handle(e);
     }
-    return {
-      success
-    };
   }
 
   /**
@@ -228,6 +245,7 @@ class Loans {
    * });
    */
   async repay(options) {
+<<<<<<< HEAD
     let response = false;
     switch (options.nftfi.contract.name) {
       case 'v1.loan.fixed':
@@ -262,6 +280,49 @@ class Loans {
         break;
     }
     return response
+=======
+    try {
+      this.#assertion.hasSigner();
+      let success = false;
+      switch (options.nftfi.contract.name) {
+        case 'v1.loan.fixed':
+          success = await this.#fixed.v1.payBackLoan({
+            loan: { id: options.loan.id }
+          });
+          break;
+        case 'v2.loan.fixed':
+          success = await this.#fixed.v2.payBackLoan({
+            loan: { id: options.loan.id }
+          });
+          break;
+        case 'v2-1.loan.fixed':
+          success = await this.#fixed.v2_1.payBackLoan({
+            loan: { id: options.loan.id }
+          });
+          break;
+        case 'v2-3.loan.fixed':
+          success = await this.#fixed.v2_3.payBackLoan({
+            loan: { id: options.loan.id }
+          });
+          break;
+        case 'v2.loan.fixed.collection':
+          success = await this.#fixed.collection.v2.payBackLoan({
+            loan: { id: options.loan.id }
+          });
+          break;
+        case 'v2-3.loan.fixed.collection':
+          success = await this.#fixed.collection.v2_3.payBackLoan({
+            loan: { id: options.loan.id }
+          });
+          break;
+      }
+      return {
+        success
+      };
+    } catch (e) {
+      return this.#error.handle(e);
+    }
+>>>>>>> 0958d2f36b379bf57f699531f461322225560aff
   }
 
   /**
@@ -286,42 +347,47 @@ class Loans {
    * });
    */
   async revokeOffer(options) {
-    let success = false;
-    switch (options.nftfi.contract.name) {
-      case 'v1.loan.fixed':
-        success = await this.#fixed.v1.cancelLoanCommitmentBeforeLoanHasBegun({
-          offer: { nonce: options.offer.nonce }
-        });
-        break;
-      case 'v2.loan.fixed':
-        success = await this.#fixed.v2.cancelLoanCommitmentBeforeLoanHasBegun({
-          offer: { nonce: options.offer.nonce }
-        });
-        break;
-      case 'v2-1.loan.fixed':
-        success = await this.#fixed.v2_1.cancelLoanCommitmentBeforeLoanHasBegun({
-          offer: { nonce: options.offer.nonce }
-        });
-        break;
-      case 'v2-3.loan.fixed':
-        success = await this.#fixed.v2_3.cancelLoanCommitmentBeforeLoanHasBegun({
-          offer: { nonce: options.offer.nonce }
-        });
-        break;
-      case 'v2.loan.fixed.collection':
-        success = await this.#fixed.collection.v2.cancelLoanCommitmentBeforeLoanHasBegun({
-          offer: { nonce: options.offer.nonce }
-        });
-        break;
-      case 'v2-3.loan.fixed.collection':
-        success = await this.#fixed.collection.v2_3.cancelLoanCommitmentBeforeLoanHasBegun({
-          offer: { nonce: options.offer.nonce }
-        });
-        break;
+    try {
+      this.#assertion.hasSigner();
+      let success = false;
+      switch (options.nftfi.contract.name) {
+        case 'v1.loan.fixed':
+          success = await this.#fixed.v1.cancelLoanCommitmentBeforeLoanHasBegun({
+            offer: { nonce: options.offer.nonce }
+          });
+          break;
+        case 'v2.loan.fixed':
+          success = await this.#fixed.v2.cancelLoanCommitmentBeforeLoanHasBegun({
+            offer: { nonce: options.offer.nonce }
+          });
+          break;
+        case 'v2-1.loan.fixed':
+          success = await this.#fixed.v2_1.cancelLoanCommitmentBeforeLoanHasBegun({
+            offer: { nonce: options.offer.nonce }
+          });
+          break;
+        case 'v2-3.loan.fixed':
+          success = await this.#fixed.v2_3.cancelLoanCommitmentBeforeLoanHasBegun({
+            offer: { nonce: options.offer.nonce }
+          });
+          break;
+        case 'v2.loan.fixed.collection':
+          success = await this.#fixed.collection.v2.cancelLoanCommitmentBeforeLoanHasBegun({
+            offer: { nonce: options.offer.nonce }
+          });
+          break;
+        case 'v2-3.loan.fixed.collection':
+          success = await this.#fixed.collection.v2_3.cancelLoanCommitmentBeforeLoanHasBegun({
+            offer: { nonce: options.offer.nonce }
+          });
+          break;
+      }
+      return {
+        success
+      };
+    } catch (e) {
+      return this.#error.handle(e);
     }
-    return {
-      success
-    };
   }
 }
 

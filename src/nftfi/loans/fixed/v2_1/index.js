@@ -6,10 +6,16 @@ class LoansFixedV2_1 {
   constructor(options) {
     this.#config = options?.config;
     this.#contractFactory = options?.contractFactory;
-    this.#contract = this.#contractFactory.create({
-      address: this.#config.loan.fixed.v2_1.address,
-      abi: this.#config.loan.fixed.v2_1.abi
-    });
+  }
+
+  get _contract() {
+    if (!this.#contract) {
+      this.#contract = this.#contractFactory.create({
+        address: this.#config.loan.fixed.v2_1.address,
+        abi: this.#config.loan.fixed.v2_1.abi
+      });
+    }
+    return this.#contract;
   }
 
   async acceptOffer(options) {
@@ -34,7 +40,7 @@ class LoansFixedV2_1 {
         revenueSharePartner: '0x0000000000000000000000000000000000000000',
         referralFeeInBasisPoints: 0
       };
-      const result = await this.#contract.call({
+      const result = await this._contract.call({
         function: 'acceptOffer',
         args: [offer, signature, borrowerSettings]
       });
@@ -53,11 +59,11 @@ class LoansFixedV2_1 {
   async liquidateOverdueLoan(options) {
     let success;
     try {
-      const result = await this.#contract.call({
+      const result = await this._contract.call({
         function: 'liquidateOverdueLoan',
         args: [options.loan.id]
       });
-      success = result?.status === 1 ? true : false;
+      success = result?.status === 1;
     } catch (e) {
       success = false;
     }
@@ -66,7 +72,7 @@ class LoansFixedV2_1 {
 
   async payBackLoan(options) {
     try {
-      const result = await this.#contract.call({
+      const result = await this._contract.call({
         function: 'payBackLoan',
         args: [options.loan.id]
       });
@@ -85,11 +91,11 @@ class LoansFixedV2_1 {
   async cancelLoanCommitmentBeforeLoanHasBegun(options) {
     let success;
     try {
-      const result = await this.#contract.call({
+      const result = await this._contract.call({
         function: 'cancelLoanCommitmentBeforeLoanHasBegun',
         args: [options.offer.nonce]
       });
-      success = result?.status === 1 ? true : false;
+      success = result?.status === 1;
     } catch (e) {
       success = false;
     }

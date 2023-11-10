@@ -6,10 +6,16 @@ class LoansFixedCollectionV2 {
   constructor(options) {
     this.#config = options?.config;
     this.#contractFactory = options?.contractFactory;
-    this.#contract = this.#contractFactory.create({
-      address: this.#config.loan.fixed.collection.v2.address,
-      abi: this.#config.loan.fixed.collection.v2.abi
-    });
+  }
+
+  get _contract() {
+    if (!this.#contract) {
+      this.#contract = this.#contractFactory.create({
+        address: this.#config.loan.fixed.collection.v2.address,
+        abi: this.#config.loan.fixed.collection.v2.abi
+      });
+    }
+    return this.#contract;
   }
 
   async acceptOffer(options) {
@@ -34,7 +40,7 @@ class LoansFixedCollectionV2 {
         revenueSharePartner: '0x0000000000000000000000000000000000000000',
         referralFeeInBasisPoints: 0
       };
-      const result = await this.#contract.call({
+      const result = await this._contract.call({
         function: 'acceptOffer',
         args: [offer, signature, borrowerSettings]
       });
@@ -53,7 +59,7 @@ class LoansFixedCollectionV2 {
   async liquidateOverdueLoan(options) {
     let success;
     try {
-      const result = await this.#contract.call({
+      const result = await this._contract.call({
         function: 'liquidateOverdueLoan',
         args: [options.loan.id]
       });
@@ -66,7 +72,7 @@ class LoansFixedCollectionV2 {
 
   async payBackLoan(options) {
     try {
-      const result = await this.#contract.call({
+      const result = await this._contract.call({
         function: 'payBackLoan',
         args: [options.loan.id]
       });
@@ -85,7 +91,7 @@ class LoansFixedCollectionV2 {
   async cancelLoanCommitmentBeforeLoanHasBegun(options) {
     let success;
     try {
-      const result = await this.#contract.call({
+      const result = await this._contract.call({
         function: 'cancelLoanCommitmentBeforeLoanHasBegun',
         args: [options.offer.nonce]
       });
