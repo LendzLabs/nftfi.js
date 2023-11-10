@@ -45,11 +45,16 @@ class LoansFixedCollectionV2_3 {
         function: 'acceptCollectionOffer',
         args: [offer, signature, borrowerSettings]
       });
-      success = result?.status === 1;
+      return {
+        receipt: result,
+        status: result?.status === 1,
+      }
     } catch (e) {
-      success = false;
+      return {
+        receipt: null,
+        status: false,
+      }
     }
-    return success;
   }
 
   async liquidateOverdueLoan(options) {
@@ -73,9 +78,15 @@ class LoansFixedCollectionV2_3 {
         function: 'payBackLoan',
         args: [options.loan.id]
       });
-      success = result?.status === 1 ? true : false;
+      return {
+        receipt: result,
+        status: result?.status === 1,
+      }
     } catch (e) {
-      success = false;
+      return {
+        receipt: null,
+        status: false,
+      };
     }
     return success;
   }
