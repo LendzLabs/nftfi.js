@@ -247,7 +247,7 @@ class Loans {
   async repay(options) {
     try {
       this.#assertion.hasSigner();
-      let response = false;
+      let response;
       switch (options.nftfi.contract.name) {
         case 'v1.loan.fixed':
           response = await this.#fixed.v1.payBackLoan({
@@ -280,9 +280,7 @@ class Loans {
           });
           break;
       }
-      return {
-        success
-      };
+      return response
     } catch (e) {
       return this.#error.handle(e);
     }

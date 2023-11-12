@@ -104,8 +104,7 @@ class Erc721 {
         function: 'setApprovalForAll',
         args: [contractAddress, true]
       });
-      success = result?.status === 1;
-      return success;
+      return result.status === 1;
     } catch (e) {
       if (options?.rethrow) throw e;
       return this.#error.handle(e);
@@ -149,7 +148,7 @@ class Erc721 {
         args: [accountAddress, contractAddress]
       });
 
-      return result;
+      return result.status === 1;
     } catch (e) {
       if (options?.rethrow) throw e;
       return this.#error.handle(e);
