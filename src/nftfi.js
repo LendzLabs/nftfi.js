@@ -254,7 +254,8 @@ export default {
       events,
       rewards,
       nft,
-      utils
+      utils,
+      offersSignatures
     });
 
     if (options?.logging?.verbose !== false) {
