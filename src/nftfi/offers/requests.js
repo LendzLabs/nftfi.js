@@ -14,7 +14,8 @@ class OffersRequests {
     this.#result = options?.result;
     this.#contractsAddresses = {
       [this.#config.loan.fixed.collection.v2.name]: this.#config.loan.fixed.collection.v2.address,
-      [this.#config.loan.fixed.v2_1.name]: this.#config.loan.fixed.v2_1.address
+      [this.#config.loan.fixed.v2_1.name]: this.#config.loan.fixed.v2_1.address,
+      [this.#config.loan.fixed.v2_3.name]: this.#config.loan.fixed.v2_3.address
     };
   }
 
