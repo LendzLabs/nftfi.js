@@ -255,7 +255,7 @@ export default {
       rewards,
       nft,
       utils,
-      auth,
+      api,
       offersSignatures
     });
 
