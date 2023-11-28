@@ -12,6 +12,7 @@ class NFTfi {
   utils;
   events;
   rewards;
+  api;
   offersSignatures;
 
   constructor(options = {}) {
@@ -29,6 +30,7 @@ class NFTfi {
     this.events = options.events;
     this.rewards = options.rewards;
     this.offersSignatures = options.offersSignatures;
+    this.api = options.api;
   }
 }
 
