@@ -49,7 +49,7 @@ class Auth {
       if (this._isTokenValid(token)) {
         this.#storage.set(this.#config.auth.token.key, token);
         this.#storage.set(this.#config.auth.refreshToken.key, refreshToken);
-        this.#token = sdkToken;
+        this.#token = token;
         return this.#token;
       }
     }
